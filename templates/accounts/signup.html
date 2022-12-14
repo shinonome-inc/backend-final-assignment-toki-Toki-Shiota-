@@ -1,0 +1,16 @@
+{% extends 'base.html' %}<!-- base.htmlを継承する -->
+
+{% block title %}Sign Up{% endblock %}<!-- base.htmlのtitleを置き換える -->
+
+{% block content %}
+<div>
+  <h1>ユーザー登録</h1>
+  <div>
+    <form method="post">
+      {% csrf_token %} <!-- pタグで囲まれた状態で表示する -->
+      {{ form.as_p }} <!-- 必須な要素。formないならどこでもOK -->
+      <button type="submit">登録</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
