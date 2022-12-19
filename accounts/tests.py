@@ -40,6 +40,29 @@ class TestSignUpView(TestCase):
 
         self.assertIn(SESSION_KEY, self.client.session)
 
+    def test_failure_post_with_empty_form(self):
+        invalid_data = {
+            "username": "",
+            "email": "",
+            "password1": "",
+            "password2": "",
+        }
+        response = self.client.post(self.url, invalid_data)
+        form = response.context["form"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(
+            User.objects.filter(
+                username=invalid_data["username"],
+                email=invalid_data["email"],
+            ).exists()
+        )
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["username"], ["このフィールドは必須です。"])
+        self.assertEqual(form.errors["email"], ["このフィールドは必須です。"])
+        self.assertEqual(form.errors["password1"], ["このフィールドは必須です。"])
+        self.assertEqual(form.errors["password2"], ["このフィールドは必須です。"])
+
     def test_failure_post_with_empty_username(self):
         invalid_data = {
             "username": "",
@@ -54,35 +77,165 @@ class TestSignUpView(TestCase):
         self.assertFalse(
             User.objects.filter(
                 username=invalid_data["username"],
-                email=invalid_data["email"],
             ).exists()
         )
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors["username"], ["このフィールドは必須です。"])
 
-    # def test_failure_post_with_empty_email(self):
-    #     pass
+    def test_failure_post_with_empty_email(self):
+        invalid_data = {
+            "username": "testuser",
+            "email": "",
+            "password1": "testpassword",
+            "password2": "testpassword",
+        }
+        response = self.client.post(self.url, invalid_data)
+        form = response.context["form"]
 
-    # def test_failure_post_with_empty_password(self):
-    #     pass
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(
+            User.objects.filter(
+                email=invalid_data["email"],
+            ).exists()
+        )
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["email"], ["このフィールドは必須です。"])
 
-    # def test_failure_post_with_duplicated_user(self):
-    #     pass
+    def test_failure_post_with_empty_password(self):
+        invalid_data = {
+            "username": "testuser",
+            "email": "test@example.com",
+            "password1": "",
+            "password2": "",
+        }
+        response = self.client.post(self.url, invalid_data)
+        form = response.context["form"]
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(
+            User.objects.filter(
+                password=invalid_data["password2"],
+            ).exists()
+        )
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["password2"], ["このフィールドは必須です。"])
 
-    # def test_failure_post_with_invalid_email(self):
-    #     pass
+    def test_failure_post_with_duplicated_user(self):
+        duplicated_data = {
+            "username": "testuser",
+            "email": "test@example.com",
+            "password1": "testpassword",
+            "password2": "testpassword",
+        }
 
-    # def test_failure_post_with_too_short_password(self):
-    #     pass
+        User.objects.create_user(
+            username="testuser",
+            email="test@example.com",
+            password="testpassword",
+        )
+        response = self.client.post(self.url, duplicated_data)
+        form = response.context["form"]
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(
+            User.objects.filter(
+                username="testuser",
+                email="test@test.com",
+            ).exists()
+        )
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["username"], ["同じユーザー名が既に登録済みです。"])
 
-    # def test_failure_post_with_password_similar_to_username(self):
-    #     pass
+    def test_failure_post_with_invalid_email(self):
+        invalid_data = {
+            "username": "testuser",
+            "email": "test",
+            "password1": "testpassword",
+            "password2": "testpassword",
+        }
+        response = self.client.post(self.url, invalid_data)
+        form = response.context["form"]
 
-    # def test_failure_post_with_only_numbers_password(self):
-    #     pass
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(
+            User.objects.filter(
+                email=invalid_data["email"],
+            ).exists()
+        )
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["email"], ["有効なメールアドレスを入力してください。"])
 
-    # def test_failure_post_with_mismatch_password(self):
-    #     pass
+    def test_failure_post_with_too_short_password(self):
+        short_password_data = {
+            "username": "testuser",
+            "email": "test@example.com",
+            "password1": "short",
+            "password2": "short",
+        }
+        response = self.client.post(self.url, short_password_data)
+        form = response.context["form"]
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(
+            User.objects.filter(
+                password=short_password_data["password2"],
+            ).exists()
+        )
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["password2"], ["このパスワードは短すぎます。最低 8 文字以上必要です。"])
+
+    def test_failure_post_with_password_similar_to_username(self):
+        password_similar_to_username_data = {
+            "username": "testuser",
+            "email": "test@example.com",
+            "password1": "testuser",
+            "password2": "testuser",
+        }
+        response = self.client.post(self.url, password_similar_to_username_data)
+        form = response.context["form"]
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(
+            User.objects.filter(
+                password=password_similar_to_username_data["password2"],
+            ).exists()
+        )
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["password2"], ["このパスワードは ユーザー名 と似すぎています。"])
+
+    def test_failure_post_with_only_numbers_password(self):
+        only_numbers_password_data = {
+            "username": "testuser",
+            "email": "test@example.com",
+            "password1": "123456789",
+            "password2": "123456789",
+        }
+        response = self.client.post(self.url, only_numbers_password_data)
+        form = response.context["form"]
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(
+            User.objects.filter(
+                password=only_numbers_password_data["password2"],
+            ).exists()
+        )
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors["password2"], ["このパスワードは一般的すぎます。", "このパスワードは数字しか使われていません。"]
+        )
+
+    def test_failure_post_with_mismatch_password(self):
+        only_numbers_password_data = {
+            "username": "testuser",
+            "email": "test@example.com",
+            "password1": "testpassword",
+            "password2": "testppassword",
+        }
+        response = self.client.post(self.url, only_numbers_password_data)
+        form = response.context["form"]
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(
+            User.objects.filter(
+                password=only_numbers_password_data["password2"],
+            ).exists()
+        )
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["password2"], ["確認用パスワードが一致しません。"])
 
 
 class TestLoginView(TestCase):
