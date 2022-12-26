@@ -129,18 +129,13 @@ class TestSignUpView(TestCase):
 
         User.objects.create_user(
             username="testuser",
-            email="test@example.com",
+            email="duplicated_user_test@example.com",
             password="testpassword",
         )
         response = self.client.post(self.url, duplicated_data)
         form = response.context["form"]
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(
-            User.objects.filter(
-                username="testuser",
-                email="test@test.com",
-            ).exists()
-        )
+        self.assertEqual(User.objects.all().count(), 1)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors["username"], ["同じユーザー名が既に登録済みです。"])
 
