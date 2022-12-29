@@ -7,8 +7,10 @@
   <h1>ユーザー登録</h1>
   <div>
     <form method="post">
-      {% csrf_token %} <!-- pタグで囲まれた状態で表示する -->
-      {{ form.as_p }} <!-- 必須な要素。formないならどこでもOK -->
+      {% csrf_token %}
+      {{ form.as_p }}
+      <!-- pタグで囲まれた状態で表示する -->
+      <!-- 必須な要素。formないならどこでもOK -->
       <button type="submit">登録</button>
     </form>
   </div>
