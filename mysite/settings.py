@@ -129,3 +129,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 
 AUTH_USER_MODEL = "accounts.CustomUser"
+
+
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "tweets:home"
+LOGOUT_REDIRECT_URL = "welcome:index"
