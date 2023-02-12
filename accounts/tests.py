@@ -335,8 +335,17 @@ class TestLogoutView(TestCase):
 
 
 class TestUserProfileView(TestCase):
-    def test_success_get(self):
-        pass
+    pass
+    # def setUp(self):
+    #     self.user = User.objects.create_user(
+    #         username="testuser",
+    #     )
+    #     self.url = reverse("accounts:user_profile")
+
+    # def test_success_get(self):
+    #     response = self.client.get(self.url)
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertTemplateUsed(response, "accounts/profile.html")
 
 
 class TestUserProfileEditView(TestCase):
