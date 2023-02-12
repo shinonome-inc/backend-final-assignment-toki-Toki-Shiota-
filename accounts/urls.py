@@ -17,10 +17,10 @@ urlpatterns = [
         name="logout",
     ),
     path(
-        '<str:username>/',
+        "<str:username>/",
         views.UserProfileView.as_view(template_name="accounts/profile.html"),
-        name='user_profile',
-        ),
+        name="user_profile",
+    ),
     # path('<str:username>/follow/', views.FollowView.as_view(), name='follow'),
     # path('<str:username>/unfollow/', views.UnFollowView, name='unfollow'),
     # path('<str:username>/following_list/', views.FollowingListView.as_view(), name='following_list'),

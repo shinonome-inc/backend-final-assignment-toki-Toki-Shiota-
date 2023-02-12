@@ -1,7 +1,7 @@
-from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView
 
@@ -56,6 +56,7 @@ template_nameはログアウト後に表示する画面。
 
 """
 
+
 class UserProfileView(LoginRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
-        return render(request, "accounts/profile.html", context)
+        return render(request, "accounts/profile.html")
