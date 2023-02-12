@@ -31,10 +31,9 @@ success_urlの時は、必ずreverse_lazy()関数を使う。
 """
 
 
-class Login(LoginRequiredMixin, LoginView):
+class Login(LoginView):
     form_class = LoginForm
     template_name = "accounts/login.html"
-    login_url = reverse_lazy("accounts:login")
 
 
 """
