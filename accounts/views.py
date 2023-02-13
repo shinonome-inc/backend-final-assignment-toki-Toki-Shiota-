@@ -59,3 +59,5 @@ template_nameはログアウト後に表示する画面。
 class UserProfileView(LoginRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
         return render(request, "accounts/profile.html")
+
+    template_name = "accounts/profile.html"
