@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView
@@ -31,7 +31,7 @@ success_urlの時は、必ずreverse_lazy()関数を使う。
 """
 
 
-class Login(LoginView):
+class LoginView(auth_views.LoginView):
     form_class = LoginForm
     template_name = "accounts/login.html"
 
@@ -42,7 +42,7 @@ LoginFormで定義したフォームデザインが適用される。
 """
 
 
-class Logout(LogoutView):
+class LogoutView(auth_views.LogoutView):
     template_name = "accounts/login.html"
 
 
