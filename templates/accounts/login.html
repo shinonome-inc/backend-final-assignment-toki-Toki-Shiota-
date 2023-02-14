@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}login{% endblock %}
+
+{% block content %}
+<div>
+    <h1>ログイン</h1>
+    <div>
+        <form method="POST">
+            {% csrf_token %}
+            <!-- CSRF対策
+            POST フォームには全て、{% csrf_token %} テンプレートタグを
+            使うことが推奨されている。-->
+            {{ form.as_p }}
+
+            {% for error in form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+                <p>{{ error }}</p>
+            </div>
+            {% endfor %}
+
+            <!-- ユーザ認証が失敗した場合にエラーメッセージを表示 -->
+
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+<!-- CSRF「クロスサイト・リクエスト・フォージェリ」とは、WEBブラウザに保存されているCookie等の値が自動的にリクエストヘッダに
+セットされて送信されるという性質を利用して、副作用を伴う重要なリクエストを利用者の意図に反して強要する攻撃のこと。 -->
