@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}プロフィール{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+    {% for tweet in tweet_list %}
+    <div class="alert alert-success" role="alert">
+        <p>投稿者：{{tweet.user.username}}</p>
+        <p>内容 : {{ tweet.content }}</p>
+        <a href="{% url 'tweets:detail' tweet.pk %}">詳細</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}
