@@ -1,10 +1,14 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView
 
+from tweets.models import Tweet
+
 from .forms import CustomUserCreationForm, LoginForm
+
+User = get_user_model()
 
 
 class SignUpView(CreateView):
@@ -56,4 +60,15 @@ template_nameはログアウト後に表示する画面。
 
 
 class UserProfileView(LoginRequiredMixin, DetailView):
-    template_name = "accounts/profile.html"
+    model = User
+    template_name = "accounts/user_profile.html"
+    slug_field = "username"
+    slug_url_kwarg = "username"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.object
+        # username = self.kwargs["username"]
+        context["tweet_list"] = Tweet.objects.select_related("user").filter(user=user)
+        # print(context)
+        return context

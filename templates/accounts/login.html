@@ -12,6 +12,7 @@
             POST フォームには全て、{% csrf_token %} テンプレートタグを
             使うことが推奨されている。-->
             {{ form.as_p }}
+            <button type="submit">ログイン</button>
 
             {% for error in form.non_field_errors %}
             <div class="alert alert-danger" role="alert">
