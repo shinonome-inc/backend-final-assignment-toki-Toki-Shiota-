@@ -47,26 +47,27 @@ class TestTweetCreateView(TestCase):
 
     def test_failure_post_with_empty_content(self):
         additional_data = {"content": ""}
-        response = self.client.get(self.url, additional_data)
+        response = self.client.post(self.url, additional_data)
         form = response.context["form"]
         self.assertEqual(response.status_code, 200)
         self.assertFalse(
             Tweet.objects.filter(content=additional_data["content"]).exists()
         )
         self.assertFalse(form.is_valid())
-        print(form.errors)
         self.assertEqual(form.errors["content"], ["このフィールドは必須です。"])
 
     def test_failure_post_with_too_long_content(self):
-        additional_data = {"content": "(test)**100"}
-        response = self.client.get(self.url, additional_data)
+        additional_data = {"content": "t" * 1000}
+        response = self.client.post(self.url, additional_data)
         form = response.context["form"]
         self.assertEqual(response.status_code, 200)
         self.assertFalse(
             Tweet.objects.filter(content=additional_data["content"]).exists()
         )
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors["content"], ["このフィールドは２００文字以下でなければなりません。"])
+        self.assertEqual(
+            form.errors["content"], ["この値は 200 文字以下でなければなりません( 1000 文字になっています)。"]
+        )
 
 
 class TestTweetDetailView(TestCase):
