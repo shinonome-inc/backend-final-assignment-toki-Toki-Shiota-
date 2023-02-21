@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}フォロー一覧{% endblock %}
+
+{% block content %}
+<h1>フォロー一覧</h1>
+{% if following_list %}
+<div class="container mt-3">
+    {% for object in following_list %}
+    <div>
+        <p>
+            <a href="{% url 'accounts:user_profile' object.following.username %}">{{ object.following }}</a>
+        </p>
+    </div>
+    {% endfor %}
+
+    {% else %}
+    <div>
+        <p class="card-text"> フォロー中の人はいません </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock content %}
