@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import HttpResponse, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, View
 
@@ -73,10 +73,10 @@ class UserProfileView(LoginRequiredMixin, DetailView):
         user = self.object
         context["tweet_list"] = Tweet.objects.select_related("user").filter(user=user)
         context["is_following"] = FriendShip.objects.filter(
-            following=self.request.user, follower=user
+            following=user, follower=self.request.user
         ).exists()
-        context["following_count"] = FriendShip.objects.filter(following=user).count()
-        context["follower_count"] = FriendShip.objects.filter(follower=user).count()
+        context["following_count"] = FriendShip.objects.filter(follower=user).count()
+        context["follower_count"] = FriendShip.objects.filter(following=user).count()
         # print(context)
         return context
 
@@ -87,11 +87,10 @@ class FollowView(LoginRequiredMixin, View):
         following = get_object_or_404(User, username=self.kwargs["username"])
 
         if follower == following:
-            messages.warning(request, messages.ERROR, "自分自身をフォローすることはできません")
-            return render(request, "tweets/home.html")
+            response = HttpResponse(status=400)
+            return response
         elif FriendShip.objects.filter(follower=follower, following=following).exists():
-            messages.warning(request, f"あなたはすでに { following.username } をフォローしています。")
-            return render(request, "tweets/home.html")
+            return HttpResponse(f"あなたはすでに { following.username } をフォローしています。")
         else:
             FriendShip.objects.create(follower=follower, following=following)
             messages.info(request, f"{ following.username } をフォローしました。")
@@ -108,8 +107,7 @@ class UnFollowView(LoginRequiredMixin, View):
             messages.info(request, f"{following.username} のフォローを解除しました。")
             return redirect("tweets:home")
         else:
-            messages.warning(request, "無効な操作です。")
-            return render(request, "tweets/home.html")
+            return HttpResponse("無効な操作です。")
 
 
 class FollowingListView(LoginRequiredMixin, ListView):

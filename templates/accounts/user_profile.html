@@ -16,14 +16,17 @@
 </div>
 <div>
     {% if request.user == user %}
-    <form action="{% url 'accounts:follow' object.username %}" method="POST">{% csrf_token %}
-        <button type="submit" class="btn btn-outline-primary">フォローする</button>
-    </form>
-    {% else %}
+    {% if is_following %}
     <form action="{%  url 'accounts:unfollow' object.username %}" method="POST">{% csrf_token %}
         <button type="submit" class="btn btn-outline-primary">フォロー解除</button>
     </form>
+    {% else %}
+    <form action="{% url 'accounts:follow' object.username %}" method="POST">{% csrf_token %}
+        <button type="submit" class="btn btn-outline-primary">フォローする</button>
+    </form>
     {% endif %}
+    {% endif %}
+
 </div>
 <div>
     <p class="nav-link"><a href="{% url 'accounts:following_list' object.username %}">

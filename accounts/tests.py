@@ -360,11 +360,11 @@ class TestUserProfileView(TestCase):
         )
         self.assertEquals(
             response.context["following_count"],
-            FriendShip.objects.filter(following=self.user).exists(),
+            FriendShip.objects.filter(follower=self.user).exists(),
         )
         self.assertEquals(
             response.context["follower_count"],
-            FriendShip.objects.filter(follower=self.user).exists(),
+            FriendShip.objects.filter(following=self.user).exists(),
         )
 
 
@@ -415,22 +415,15 @@ class TestFollowView(TestCase):
             reverse("accounts:follow", kwargs={"username": "empty"})
         )
         self.assertEqual(response.status_code, 404)
-        self.assertFalse(
-            FriendShip.objects.filter(
-                following__username="empty", follower=self.user1
-            ).exists()
-        )
+        self.assertFalse(FriendShip.objects.count(), 0)
 
     def test_failure_post_with_self(self):
         response = self.client.post(
             reverse("accounts:follow", kwargs={"username": self.user1.username})
         )
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(
-            FriendShip.objects.filter(
-                following=self.user1, follower=self.user1
-            ).exists()
-        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(FriendShip.objects.count(), 0)
 
 
 class TestUnfollowView(TestCase):
@@ -467,22 +460,14 @@ class TestUnfollowView(TestCase):
             reverse("accounts:unfollow", kwargs={"username": "empty"})
         )
         self.assertEqual(response.status_code, 404)
-        self.assertFalse(
-            FriendShip.objects.filter(
-                following__username="empty", follower=self.user1
-            ).exists()
-        )
+        self.assertTrue(FriendShip.objects.count(), 1)
 
     def test_failure_post_with_incorrect_user(self):
         response = self.client.post(
             reverse("accounts:unfollow", kwargs={"username": self.user1.username})
         )
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(
-            FriendShip.objects.filter(
-                following=self.user1, follower=self.user1
-            ).exists()
-        )
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(FriendShip.objects.count(), 1)
 
 
 class TestFollowingListView(TestCase):

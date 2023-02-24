@@ -31,5 +31,9 @@ class FriendShip(models.Model):
     )
     date_created = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return "{} : {}".format(self.follower.username, self.following.username)
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["follower", "following"], name="unique_constraint"
+            )
+        ]
