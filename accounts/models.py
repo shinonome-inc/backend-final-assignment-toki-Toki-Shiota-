@@ -37,3 +37,6 @@ class FriendShip(models.Model):
                 fields=["follower", "following"], name="unique_constraint"
             )
         ]
+
+    def __str__(self):
+        return "{} : {}".format(self.follower.username, self.following.username)

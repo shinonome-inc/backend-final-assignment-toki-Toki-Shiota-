@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseBadRequest
 from django.shortcuts import HttpResponse, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, View
@@ -87,10 +88,10 @@ class FollowView(LoginRequiredMixin, View):
         following = get_object_or_404(User, username=self.kwargs["username"])
 
         if follower == following:
-            response = HttpResponse(status=400)
-            return response
+            return HttpResponseBadRequest("自分自身をフォローすることはできません")
         elif FriendShip.objects.filter(follower=follower, following=following).exists():
-            return HttpResponse(f"あなたはすでに { following.username } をフォローしています。")
+            messages.warning(request, f"あなたはすでに { following.username } をフォローしています。")
+            return redirect("tweets:home")
         else:
             FriendShip.objects.create(follower=follower, following=following)
             messages.info(request, f"{ following.username } をフォローしました。")
@@ -106,6 +107,8 @@ class UnFollowView(LoginRequiredMixin, View):
             friend.delete()
             messages.info(request, f"{following.username} のフォローを解除しました。")
             return redirect("tweets:home")
+        elif follower == following:
+            return HttpResponseBadRequest("無効な操作です。")
         else:
             return HttpResponse("無効な操作です。")
 
