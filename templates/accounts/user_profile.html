@@ -15,17 +15,16 @@
     {% endfor %}
 </div>
 <div>
-    {% if request.user != user %}
-
-    {% elif is_following %}
+    {% if object.username != request.user.username %}
+    {% if is_following %}
     <form action="{%  url 'accounts:unfollow' object.username %}" method="POST">{% csrf_token %}
         <button type="submit" class="btn btn-outline-primary">フォロー解除</button>
     </form>
-    {% elif request.user == user %}
     {% else %}
     <form action="{% url 'accounts:follow' object.username %}" method="POST">{% csrf_token %}
         <button type="submit" class="btn btn-outline-primary">フォローする</button>
     </form>
+    {% endif %}
     {% endif %}
 
 </div>
