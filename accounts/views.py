@@ -89,11 +89,10 @@ class FollowView(LoginRequiredMixin, View):
 
         if follower == following:
             return HttpResponseBadRequest("自分自身をフォローすることはできません")
-        elif FriendShip.objects.filter(follower=follower, following=following).exists():
+        if FriendShip.objects.filter(follower=follower, following=following).exists():
             messages.warning(request, f"あなたはすでに { following.username } をフォローしています。")
             return redirect("tweets:home")
-        else:
-            FriendShip.objects.create(follower=follower, following=following)
+        if FriendShip.objects.create(follower=follower, following=following):
             messages.info(request, f"{ following.username } をフォローしました。")
             return redirect("tweets:home")
 
