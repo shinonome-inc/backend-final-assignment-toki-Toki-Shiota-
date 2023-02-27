@@ -4,6 +4,17 @@
 
 {% block content %}
 <h1>home</h1>
+{% if messages %}
+<div>
+    <p>
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+            {% endfor %}
+    </ul>
+    </p>
+</div>
+{% endif %}
 {% for tweet in tweet_list %}
 <div>
     <p>投稿者 : {{ tweet.user }}</p>

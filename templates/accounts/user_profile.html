@@ -3,6 +3,8 @@
 {% block title %}プロフィール{% endblock %}
 
 {% block content %}
+<a href="{% url 'tweets:home' %}">ホームへ戻る</a>
+<h1>{{ object.username }}</h1>
 <div class="container mt-3">
     {% for tweet in tweet_list %}
     <div class="alert alert-success" role="alert">
@@ -12,4 +14,28 @@
     </div>
     {% endfor %}
 </div>
-{% endblock content %}
+<div>
+    {% if object.username != request.user.username %}
+    {% if is_following %}
+    <form action="{%  url 'accounts:unfollow' object.username %}" method="POST">{% csrf_token %}
+        <button type="submit" class="btn btn-outline-primary">フォロー解除</button>
+    </form>
+    {% else %}
+    <form action="{% url 'accounts:follow' object.username %}" method="POST">{% csrf_token %}
+        <button type="submit" class="btn btn-outline-primary">フォローする</button>
+    </form>
+    {% endif %}
+    {% endif %}
+
+</div>
+<div>
+    <p class="nav-link"><a href="{% url 'accounts:following_list' object.username %}">
+            <button type="button" class="btn btn-outline-secondary btn-sm">
+                フォロー中 {{ following_count }}
+            </button></a> <a href="{% url 'accounts:follower_list' object.username %}">
+            <button type="button" class="btn btn-outline-secondary btn-sm">
+                フォロワー {{ follower_count }}
+            </button></a>
+    </p>
+</div>
+{% endblock %}

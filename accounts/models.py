@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -19,3 +20,23 @@ class CustomUser(AbstractUser):
     >python manage.py migrate
     （データベースに適応）
 """
+
+
+class FriendShip(models.Model):
+    follower = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="followings", on_delete=models.CASCADE
+    )
+    following = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="followers", on_delete=models.CASCADE
+    )
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["follower", "following"], name="unique_constraint"
+            )
+        ]
+
+    def __str__(self):
+        return "{} : {}".format(self.follower.username, self.following.username)
