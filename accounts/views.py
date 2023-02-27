@@ -92,9 +92,9 @@ class FollowView(LoginRequiredMixin, View):
         if FriendShip.objects.filter(follower=follower, following=following).exists():
             messages.warning(request, f"あなたはすでに { following.username } をフォローしています。")
             return redirect("tweets:home")
-        if FriendShip.objects.create(follower=follower, following=following):
-            messages.info(request, f"{ following.username } をフォローしました。")
-            return redirect("tweets:home")
+        FriendShip.objects.create(follower=follower, following=following)
+        messages.info(request, f"{ following.username } をフォローしました。")
+        return redirect("tweets:home")
 
 
 class UnFollowView(LoginRequiredMixin, View):
