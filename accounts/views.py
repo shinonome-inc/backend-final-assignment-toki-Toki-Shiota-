@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseBadRequest
-from django.shortcuts import HttpResponse, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, View
 
@@ -78,7 +78,6 @@ class UserProfileView(LoginRequiredMixin, DetailView):
         ).exists()
         context["following_count"] = FriendShip.objects.filter(follower=user).count()
         context["follower_count"] = FriendShip.objects.filter(following=user).count()
-        # print(context)
         return context
 
 
@@ -102,14 +101,13 @@ class UnFollowView(LoginRequiredMixin, View):
         follower = self.request.user
         following = get_object_or_404(User, username=self.kwargs["username"])
 
-        if friend := FriendShip.objects.filter(following=following, follower=follower):
-            friend.delete()
-            messages.info(request, f"{following.username} のフォローを解除しました。")
-            return redirect("tweets:home")
-        elif follower == following:
+        if follower == following:
             return HttpResponseBadRequest("無効な操作です。")
-        else:
-            return HttpResponse("無効な操作です。")
+
+        friend = FriendShip.objects.filter(following=following, follower=follower)
+        friend.delete()
+        messages.info(request, f"{following.username} のフォローを解除しました。")
+        return redirect("tweets:home")
 
 
 class FollowingListView(LoginRequiredMixin, ListView):
