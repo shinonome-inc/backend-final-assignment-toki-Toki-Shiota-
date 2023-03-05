@@ -50,7 +50,7 @@ LoginFormで定義したフォームデザインが適用される。
 
 
 class LogoutView(auth_views.LogoutView):
-    template_name = "accounts/login.html"
+    pass
 
 
 """
