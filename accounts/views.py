@@ -73,16 +73,10 @@ class UserProfileView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         user = self.object
         context["tweet_list"] = Tweet.objects.select_related("user").filter(user=user)
-        context["is_following"] = FriendShip.objects.filter(
-            following=user, follower=self.request.user
-        ).exists()
+        context["is_following"] = FriendShip.objects.filter(following=user, follower=self.request.user).exists()
         context["following_count"] = FriendShip.objects.filter(follower=user).count()
         context["follower_count"] = FriendShip.objects.filter(following=user).count()
-        liked_list = (
-            Like.objects.select_related("tweet")
-            .filter(user=self.request.user)
-            .values_list("tweet")
-        )
+        liked_list = Like.objects.select_related("tweet").filter(user=self.request.user).values_list("tweet")
         context["like_count"] = liked_list
         return context
 
@@ -123,9 +117,7 @@ class FollowingListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = get_object_or_404(User, username=self.kwargs["username"])
-        context["following_list"] = FriendShip.objects.select_related(
-            "following"
-        ).filter(follower=user)
+        context["following_list"] = FriendShip.objects.select_related("following").filter(follower=user)
         return context
 
 
@@ -136,7 +128,5 @@ class FollowerListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = get_object_or_404(User, username=self.kwargs["username"])
-        context["follower_list"] = FriendShip.objects.select_related("follower").filter(
-            following=user
-        )
+        context["follower_list"] = FriendShip.objects.select_related("follower").filter(following=user)
         return context
