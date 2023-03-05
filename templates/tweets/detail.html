@@ -6,9 +6,14 @@
 <div>
     <p>投稿者 : <a href="{% url 'accounts:user_profile' tweet.user.username %}">{{ tweet.user }}</a></p>
     <p>内容 : {{ tweet.content }}</p>
+    {% include 'tweets/like.html' %}
+    <P>いいね数：{{ like_count }}</P>
 </div>
 {% if tweet.user == request.user %}
 <a href="{% url 'tweets:delete' tweet.pk %}"><button type="button">削除</button></a>
 </form>
 {% endif %}
+{% endblock %}
+{% block js %}
+{% include 'tweets/script.html' %}
 {% endblock %}

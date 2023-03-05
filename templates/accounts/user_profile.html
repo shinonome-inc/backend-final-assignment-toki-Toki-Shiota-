@@ -11,6 +11,7 @@
         <p>投稿者：{{tweet.user.username}}</p>
         <p>内容 : {{ tweet.content }}</p>
         <a href="{% url 'tweets:detail' tweet.pk %}">詳細</a>
+        {% include "tweets/like.html" %}
     </div>
     {% endfor %}
 </div>
@@ -38,4 +39,7 @@
             </button></a>
     </p>
 </div>
+{% endblock %}
+{% block js %}
+{% include 'tweets/script.html' %}
 {% endblock %}
