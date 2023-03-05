@@ -15,12 +15,11 @@
     <div class="container">
         <h4><a href="{% url 'tweets:home'%}">TwitterClone</a></h4>
         <div class="item-wrap">
-            {% if user.is_authenticated %}
+            {% if equest.user.is_authenticated %}
+            <a href="{% url 'welcome:index'%}" class="logout-button">ログアウト</a>
+            {% else %}
             <a href="{% url 'accounts:login' %}" class="login-button">ログイン</a>
             <a href="{% url 'accounts:signup' %}" class="signup-button">登録</a>
-
-            {% else %}
-            <a href="{% url 'welcome:index'%}" class="logout-button">ログアウト</a>
             {% endif %}
         </div>
     </div>

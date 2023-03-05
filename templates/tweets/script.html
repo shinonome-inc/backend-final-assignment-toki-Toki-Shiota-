@@ -26,14 +26,17 @@
     }
 
     const changeStyle = (tweet_data, like_button) => {
+        const like_count = document.querySelector(".count_" + tweet_data.tweet_id)
         if (tweet_data.is_liked) {
             unlike_url = tweet_data.unlike_url;
             like_button.setAttribute('data-url', unlike_url);
             like_button.innerHTML = "いいね解除";
+            like_count.textContent = tweet_data.like_count;
         } else {
             like_url = tweet_data.like_url;
             like_button.setAttribute('data-url', like_url);
             like_button.innerHTML = "いいね";
+            like_count.textContent = tweet_data.like_count;
         }
     }
 </script>
