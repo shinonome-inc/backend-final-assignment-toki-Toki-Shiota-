@@ -12,12 +12,8 @@ class Tweet(models.Model):
 
 
 class Like(models.Model):
-    tweet = models.ForeignKey(
-        Tweet, on_delete=models.CASCADE, related_name="like_tweet"
-    )
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="like_user"
-    )
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE, related_name="like_tweet")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="like_user")
 
     class Meta:
         constraints = [
