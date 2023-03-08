@@ -13,6 +13,7 @@ class HomeView(LoginRequiredMixin, ListView):
     model = Tweet
     template_name = "tweets/home.html"
     ordering = "-created_at"
+    queryset = Tweet.objects.select_related("user").prefetch_related("like_tweet")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -40,11 +41,14 @@ class TweetDetailView(LoginRequiredMixin, DetailView):
     # 詳細機能
     model = Tweet
     template_name = "tweets/detail.html"
+    queryset = Tweet.objects.select_related("user").prefetch_related("like_tweet")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         liked_list = (
-            Like.objects.select_related("tweet").filter(user=self.request.user).values_list("tweet", flat=True)
+            Like.objects.select_related("tweet")
+            .filter(tweet=self.object, user=self.request.user)
+            .values_list("tweet", flat=True)
         )
         context["liked_list"] = liked_list
         return context
