@@ -4,6 +4,7 @@
 
 {% block content %}
 <h1>home</h1>
+<p><a href="{% url 'tweets:create' %}"><button type="button">ツイート</button></a></p>
 {% if messages %}
 <div>
     <p>
@@ -20,8 +21,11 @@
     <p>投稿者 : {{ tweet.user }}</p>
     <p>内容 : {{ tweet.content }}</p>
     <a href="{% url 'tweets:detail' tweet.pk %}">詳細</a>
+    {% include 'tweets/like.html' %}
+
 </div>
 {% endfor %}
-<p><a href="{% url 'tweets:create' %}"><button type="button">ツイート</button></a></p>
-<a href="{% url 'accounts:logout' %}">ログアウト</a>
-{% endblock content %}
+{% endblock %}
+{% block js %}
+{% include 'tweets/script.html' %}
+{% endblock %}

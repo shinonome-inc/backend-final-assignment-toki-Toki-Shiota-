@@ -213,9 +213,7 @@ class TestSignUpView(TestCase):
             ).exists()
         )
         self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors["password2"], ["このパスワードは一般的すぎます。", "このパスワードは数字しか使われていません。"]
-        )
+        self.assertEqual(form.errors["password2"], ["このパスワードは一般的すぎます。", "このパスワードは数字しか使われていません。"])
 
     def test_failure_post_with_mismatch_password(self):
         only_numbers_password_data = {
@@ -320,7 +318,6 @@ class TestLogoutView(TestCase):
         self.client.login(username="testuser", password="testpassword")
 
     def test_success_get(self):
-
         response = self.client.get(reverse("accounts:logout"))
 
         self.assertRedirects(
@@ -351,9 +348,7 @@ class TestUserProfileView(TestCase):
         self.client.login(username="testuser", password="testpassword")
         Tweet.objects.create(user=self.user, content="test")
         FriendShip.objects.create(following=self.user2, follower=self.user)
-        response = self.client.get(
-            reverse("accounts:user_profile", kwargs={"username": self.user.username})
-        )
+        response = self.client.get(reverse("accounts:user_profile", kwargs={"username": self.user.username}))
         self.assertQuerysetEqual(
             response.context["tweet_list"],
             Tweet.objects.filter(user=self.user),
@@ -395,14 +390,8 @@ class TestFollowView(TestCase):
         self.client.login(username="testuser1", password="testpassword1")
 
     def test_success_post(self):
-        response = self.client.post(
-            reverse("accounts:follow", kwargs={"username": self.user2.username})
-        )
-        self.assertTrue(
-            FriendShip.objects.filter(
-                following=self.user2, follower=self.user1
-            ).exists()
-        )
+        response = self.client.post(reverse("accounts:follow", kwargs={"username": self.user2.username}))
+        self.assertTrue(FriendShip.objects.filter(following=self.user2, follower=self.user1).exists())
         self.assertRedirects(
             response,
             reverse("tweets:home"),
@@ -411,16 +400,12 @@ class TestFollowView(TestCase):
         )
 
     def test_failure_post_with_not_exist_user(self):
-        response = self.client.post(
-            reverse("accounts:follow", kwargs={"username": "empty"})
-        )
+        response = self.client.post(reverse("accounts:follow", kwargs={"username": "empty"}))
         self.assertEqual(response.status_code, 404)
         self.assertFalse(FriendShip.objects.count(), 0)
 
     def test_failure_post_with_self(self):
-        response = self.client.post(
-            reverse("accounts:follow", kwargs={"username": self.user1.username})
-        )
+        response = self.client.post(reverse("accounts:follow", kwargs={"username": self.user1.username}))
 
         self.assertEqual(response.status_code, 400)
         self.assertFalse(FriendShip.objects.count(), 0)
@@ -440,14 +425,8 @@ class TestUnfollowView(TestCase):
         FriendShip.objects.create(following=self.user2, follower=self.user1)
 
     def test_success_post(self):
-        response = self.client.post(
-            reverse("accounts:unfollow", kwargs={"username": self.user2.username})
-        )
-        self.assertFalse(
-            FriendShip.objects.filter(
-                following=self.user2, follower=self.user1
-            ).exists()
-        )
+        response = self.client.post(reverse("accounts:unfollow", kwargs={"username": self.user2.username}))
+        self.assertFalse(FriendShip.objects.filter(following=self.user2, follower=self.user1).exists())
         self.assertRedirects(
             response,
             reverse("tweets:home"),
@@ -456,16 +435,12 @@ class TestUnfollowView(TestCase):
         )
 
     def test_failure_post_with_not_exist_tweet(self):
-        response = self.client.post(
-            reverse("accounts:unfollow", kwargs={"username": "empty"})
-        )
+        response = self.client.post(reverse("accounts:unfollow", kwargs={"username": "empty"}))
         self.assertEqual(response.status_code, 404)
         self.assertTrue(FriendShip.objects.count(), 1)
 
     def test_failure_post_with_incorrect_user(self):
-        response = self.client.post(
-            reverse("accounts:unfollow", kwargs={"username": self.user1.username})
-        )
+        response = self.client.post(reverse("accounts:unfollow", kwargs={"username": self.user1.username}))
         self.assertEqual(response.status_code, 400)
         self.assertTrue(FriendShip.objects.count(), 1)
 
@@ -477,9 +452,7 @@ class TestFollowingListView(TestCase):
             password="testpassword",
         )
         self.client.login(username="testuser", password="testpassword")
-        response = self.client.get(
-            reverse("accounts:following_list", kwargs={"username": self.user.username})
-        )
+        response = self.client.get(reverse("accounts:following_list", kwargs={"username": self.user.username}))
         self.assertEqual(response.status_code, 200)
 
 
@@ -490,7 +463,5 @@ class TestFollowerListView(TestCase):
             password="testpassword",
         )
         self.client.login(username="testuser", password="testpassword")
-        response = self.client.get(
-            reverse("accounts:follower_list", kwargs={"username": self.user.username})
-        )
+        response = self.client.get(reverse("accounts:follower_list", kwargs={"username": self.user.username}))
         self.assertEqual(response.status_code, 200)

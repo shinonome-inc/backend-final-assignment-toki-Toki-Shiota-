@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, View
 
-from tweets.models import Tweet
+from tweets.models import Like, Tweet
 
 from .forms import CustomUserCreationForm, LoginForm
 from .models import FriendShip
@@ -50,7 +50,7 @@ LoginFormで定義したフォームデザインが適用される。
 
 
 class LogoutView(auth_views.LogoutView):
-    template_name = "accounts/login.html"
+    pass
 
 
 """
@@ -72,12 +72,11 @@ class UserProfileView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.object
-        context["tweet_list"] = Tweet.objects.select_related("user").filter(user=user)
-        context["is_following"] = FriendShip.objects.filter(
-            following=user, follower=self.request.user
-        ).exists()
+        context["tweet_list"] = Tweet.objects.select_related("user").prefetch_related("like_tweet").filter(user=user)
+        context["is_following"] = FriendShip.objects.filter(following=user, follower=self.request.user).exists()
         context["following_count"] = FriendShip.objects.filter(follower=user).count()
         context["follower_count"] = FriendShip.objects.filter(following=user).count()
+        context["liked_list"] = Like.objects.filter(user=self.request.user).values_list("tweet", flat=True)
         return context
 
 
@@ -117,9 +116,7 @@ class FollowingListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = get_object_or_404(User, username=self.kwargs["username"])
-        context["following_list"] = FriendShip.objects.select_related(
-            "following"
-        ).filter(follower=user)
+        context["following_list"] = FriendShip.objects.select_related("following").filter(follower=user)
         return context
 
 
@@ -130,7 +127,5 @@ class FollowerListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = get_object_or_404(User, username=self.kwargs["username"])
-        context["follower_list"] = FriendShip.objects.select_related("follower").filter(
-            following=user
-        )
+        context["follower_list"] = FriendShip.objects.select_related("follower").filter(following=user)
         return context
