@@ -17,10 +17,9 @@ class HomeView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        liked_list = (
+        context["liked_list"] = (
             Like.objects.select_related("tweet").filter(user=self.request.user).values_list("tweet", flat=True)
         )
-        context["liked_list"] = liked_list
         return context
 
 
@@ -45,12 +44,11 @@ class TweetDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        liked_list = (
+        context["liked_list"] = (
             Like.objects.select_related("tweet")
             .filter(tweet=self.object, user=self.request.user)
             .values_list("tweet", flat=True)
         )
-        context["liked_list"] = liked_list
         return context
 
 
